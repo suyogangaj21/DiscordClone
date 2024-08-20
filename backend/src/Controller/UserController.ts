@@ -6,15 +6,22 @@
 
  const prisma=new PrismaClient();
 
- export const allusers=catchAsyncError(async(req:Request,res:Response,next:NextFunction)=>{
-           const user=await prisma.user.findMany();
+ export const Login=catchAsyncError(async(req:Request,res:Response,next:NextFunction)=>{
+           let user=await prisma.user.findUnique({where:{
+              email:req.body.email
+           }});
        
            console.log(user,"ok");
            
            if (!user){
-                return next(new ErrorHandler("No User Found",400));}
-           return res.status(201).json({user});
-   
-        
- }
-)
+               user=await prisma.user.create({data:{...req.body}})
+           }
+           if(!user){
+               return new ErrorHandler("Something went Wrong!",401);
+           }
+
+           return res.status(201).json({user}); 
+          
+          }
+) 
+
