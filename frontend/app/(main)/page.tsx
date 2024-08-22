@@ -1,16 +1,21 @@
-import SignIn from "@/components/SignIn";
-import Image from "next/image";
-import {auth} from "@/auth"
+'use client'
+
 import { SignOut } from "@/components/SignOut";
-export default async function Home () {
+import { useSession } from "next-auth/react";
 
-  const session= await auth()
+import { useRouter } from "next/navigation";
 
-  if (!session?.user) return <SignIn/>
- 
+export default  function Home () {
+  const session=useSession()
+  
+  const router= useRouter();
+  if (session?.status == "unauthenticated" ){
+      router.push('/login')
+  }
+   console.log(session);
   return (
     <div>
-      <img src={session.user.image || "image"} alt="User Avatar" />
+      <img src={session?.data?.user.image || "image"} alt="User Avatar" />
       <SignOut/>
     </div>
   )

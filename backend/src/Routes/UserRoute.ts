@@ -3,7 +3,7 @@ import { Login } from "../Controller/UserController";
 
 const router =Router();
 
-router.route("/login").get(Login);
+router.route("/login").post(Login);
 
 
 export default router;

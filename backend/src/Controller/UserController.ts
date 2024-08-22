@@ -7,12 +7,14 @@
  const prisma=new PrismaClient();
 
  export const Login=catchAsyncError(async(req:Request,res:Response,next:NextFunction)=>{
+           console.log(req.body)
            let user=await prisma.user.findUnique({where:{
               email:req.body.email
            }});
-       
-           console.log(user,"ok");
-           
+            
+            if(user){
+                return res.status(200).json("Aleready Exists");
+            }
            if (!user){
                user=await prisma.user.create({data:{...req.body}})
            }

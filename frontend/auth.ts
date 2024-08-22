@@ -29,6 +29,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   
   providers: [Google],
   session: { strategy: "jwt" },
+  pages:{
+    signIn:'/login',
+    signOut:'/login'
+    
+  },
   callbacks: {
     
     // authorized({ request, auth }) {
@@ -36,13 +41,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     //   if (pathname === "/middleware-example") return !!auth
     //   return true
     // },
-    // jwt({ token, trigger, session, account }) {
-    //   if (trigger === "update") token.name = session.user.name
-    //   if (account?.provider === "keycloak") {
-    //     return { ...token, accessToken: account.access_token }
-    //   }
-    //   return token
-    // },
+    jwt({ token, trigger, session, account }) {
+      if (trigger === "update") token.name = session.user.name
+      if (account?.provider === "keycloak") {
+        return { ...token, accessToken: account.access_token }
+      }
+      return token
+    },
     // async session({ session, token }) {
     //   if (token?.accessToken) {
     //     session.accessToken = token.accessToken
@@ -63,6 +68,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
       }
     },
+    async signIn({profile,user}){
+       const email=profile?.email; 
+       const profile_picture=profile?.picture;
+       const data=JSON.stringify({
+        email:email,
+        picture:profile_picture,
+        firstName:profile?.given_name,
+        lastName:profile?.family_name,
+       })
+        console.log(data)
+       
+       try{
+            const res= await fetch(`${process.env.BACKEND_URL}/api/login`,{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body : data  })
+            console.log(res.json())
+
+        }catch(e){
+          console.log(e)
+          return false;
+          
+        }
+      
+       return true;
+    }
   }
 }
 )
